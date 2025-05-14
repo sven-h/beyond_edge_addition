@@ -330,8 +330,8 @@ def evaluate(system, ground_truth, system_prefix: str = "http://createdbyedc.org
 
 if __name__ == "__main__":
     argparser = ArgumentParser()
-    argparser.add_argument("--ground_truth", type=str, default="data/ie_dataset_v3/test_dataset.jsonl")
-    argparser.add_argument("--system", type=str, default="run_with_train_examples_2_no_enrichment/final_linked_results.json")
+    argparser.add_argument("--ground_truth", type=str, default="test_dataset.jsonl")
+    argparser.add_argument("--system", type=str, default="final_linked_results.json")
     argparser.add_argument("--system_prefix", type=str, default="http://createdbyedc.org/")
 
     args = argparser.parse_args()
