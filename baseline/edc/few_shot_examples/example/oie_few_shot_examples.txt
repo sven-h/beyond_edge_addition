@@ -1,0 +1,23 @@
+Example 1:
+Text: The location of Trane is Swords, Dublin.
+Triplets: [['Trane', 'location', 'Swords,  Dublin']]
+
+Example 2:
+Text: The Ciudad Ayala city, a part of Morelos with population density and population of 1604.0 and 1,777,539 respectively, has a UTC offset of -6. The government type of Ciudad Ayala is council-manager government and City Manager is one of the leaders.
+Triplets: [['Ciudad  Ayala', 'populationMetro', '1777539'], ['Ciudad  Ayala', 'leaderTitle', '"City Manager"'], ['Ciudad  Ayala', 'type', 'City'], ['Ciudad  Ayala', 'populationDensity', '1604.0'], ['Ciudad  Ayala', 'governmentType', 'Council-manager  government'], ['Ciudad  Ayala', 'utcOffset', '−6'], ['Ciudad  Ayala', 'isPartOf', 'Morelos']]
+
+Example 3:
+Text: The 17068.8 millimeter long ALCO RS-3 has a diesel-electric transmission.
+Triplets: [['ALCO  RS-3', 'powerType', 'Diesel-electric  transmission'], ['ALCO  RS-3', 'length', '17068.8 (millimetres)']]
+
+Example 4:
+Text: Alan B. Miller Hall, in Virginia, USA, was designed by Robert A.M. Stern. The address of the hall is "101 Ukrop Way" and the current tenants are the Mason School of Business.
+Triplets: [['Alan  B.  Miller  Hall', 'architect', 'Robert  A.  M.  Stern'], ['Alan  B.  Miller  Hall', 'address', '"101 Ukrop Way"'], ['Alan  B.  Miller  Hall', 'currentTenants', 'Mason  School  of  Business'], ['Alan  B.  Miller  Hall', 'location', 'Virginia'], ['Mason  School  of  Business', 'country', 'United  States']]
+
+Example 5:
+Text: Liselotte Grschebina was born in Karlsruhe and died in Israel. Ethnic groups in Israel include Arabs.
+Triplets: [['Liselotte  Grschebina', 'bornIn', 'Karlsruhe'], ['Liselotte  Grschebina', 'diedIn', 'Israel'], ['Israel', 'ethnicGroup', 'Arab  citizens  of  Israel']]
+
+Example 6:
+Text: Agremiação Sportiva Arapiraquense managed by Vica has 17000 members and play in the Campeonato Brasileiro Série C league which is from Brazil.
+Triplets: [['Agremiação  Sportiva  Arapiraquense', 'league', 'Campeonato  Brasileiro  Série  C'], ['Campeonato  Brasileiro  Série  C', 'country', 'Brazil'], ['Agremiação  Sportiva  Arapiraquense', 'numberOfMembers', '17000'], ['Agremiação  Sportiva  Arapiraquense', 'manager', 'Vica']]
