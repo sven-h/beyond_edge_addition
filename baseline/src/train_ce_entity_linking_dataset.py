@@ -14,7 +14,6 @@ from sentence_transformers.cross_encoder.evaluation import CrossEncoderReranking
 from sentence_transformers.cross_encoder.losses import BinaryCrossEntropyLoss
 from tqdm import tqdm
 from transformers import AutoTokenizer
-from GenDecider.fastchat.model import get_conversation_template
 from argparse import ArgumentParser
 from typing import List
 from datasets import Dataset,DatasetDict
