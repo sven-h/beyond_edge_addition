@@ -148,8 +148,8 @@ def retrieve_candidates(entities,
 
 
 
-def prepare_context_candidates(data: List[Example], entity_index, entity_mapping, with_none_case=False):
-    model, candidate_index, candidate_mapping = get_retrieval_elements(entity_index, entity_mapping)
+def prepare_context_candidates(data: List[Example], entity_index, entity_mapping, candidate_retrieval_model, with_none_case=False):
+    model, candidate_index, candidate_mapping = get_retrieval_elements(entity_index, entity_mapping, candidate_retrieval_model)
 
     all_entities = []
     for item in data:
@@ -222,6 +222,7 @@ if __name__ == "__main__":
     argument_parser.add_argument("--development_data_path", type=str)
     argument_parser.add_argument("--model_path", type=str, default="meta-llama/Llama-3.1-8B-Instruct")
     argument_parser.add_argument("--with_none_case", action="store_true")
+    argument_parser.add_argument("--candidate_retrieval_model", type=str, default="candidate_retriever/final")
     argument_parser.add_argument("--entity_index", type=str, default="entity_index.index")
     argument_parser.add_argument("--entity_mapping", type=str, default="entity_index.json")
 
@@ -230,6 +231,7 @@ if __name__ == "__main__":
 
     entity_index = args.entity_index
     entity_mapping = args.entity_mapping
+    candidate_retrieval_model = args.candidate_retrieval_model
 
     kg_container = KGContainer()
     train_data = load_data(args.training_data_path, kg_container)
@@ -241,8 +243,8 @@ if __name__ == "__main__":
     else:
         dev_data = load_data(args.development_data_path, kg_container)
 
-    context_candidates_list = prepare_context_candidates(train_data, entity_index, entity_mapping, True)
-    dev_context_candidates_list = prepare_context_candidates(dev_data, entity_index, entity_mapping, True)
+    context_candidates_list = prepare_context_candidates(train_data, entity_index, entity_mapping, candidate_retrieval_model, True)
+    dev_context_candidates_list = prepare_context_candidates(dev_data, entity_index, entity_mapping, candidate_retrieval_model, True)
 
     create_sft_data(context_candidates_list,
                     "el_rerank_train", args.model_path, args.with_none_case)

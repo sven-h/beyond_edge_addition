@@ -149,7 +149,7 @@ if __name__ == "__main__":
         help="Embedding model used for entity linking. Has to be a sentence transformer. Please refer to https://sbert.net/",
     )
 
-    argparser.add_argument("--model_type", default="vllm", help="Model type: vllm, hf, or sts")
+    argparser.add_argument("--model_type", default="sts", help="Model type: vllm, hf, or sts")
     argparser.add_argument("--index_name", default="entity_index", help="Name of the index file to save")
     kgc = KGContainer()
 

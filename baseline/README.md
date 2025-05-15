@@ -1,14 +1,40 @@
+# Baseline
 This directory contains the baseline model.
 It relies on code from the NASTyLinker method (https://github.com/nheist/CaLiGraph) as well as code from the EDC framework (https://github.com/clear-nus/edc).
 
+## Preparation
 Several steps are necessary to get a running method. 
 Given the dataset, the following steps are necessary:
 1. Train the schema retriever using [create_schema_gen_dataset.py](src%2Fcreate_schema_gen_dataset.py) and [train_sentence_transformers.py](src%2Ftrain_sentence_transformers.py).
+````
+python create_schema_gen_dataset.py train.json --development_data_path dev.json --add_special_prompt
+````
+````
+python train_sentence_transformers.py schema_gen_dataset schema_retriever
+````
 2. Generate entity mention definitions using [generate_mention_definitions.py](src%2Fgenerate_mention_definitions.py)
-3. Train the candidate retrieval using [create_candidate_gen_dataset.py](src%2Fcreate_candidate_gen_dataset.py) and [train_sentence_transformers.py](src%2Ftrain_sentence_transformers.py)
-4. Create an candidate index using [construct_entity_index.py](src%2Fconstruct_entity_index.py)
-5. Train the cross-encoder using [train_ce_entity_linking_dataset.py](src%2Ftrain_ce_entity_linking_dataset.py)
 
+````
+python generate_mention_definitions.py train.jsonl generated.jsonl
+````
+
+3. Train the candidate retrieval using [create_candidate_gen_dataset.py](src%2Fcreate_candidate_gen_dataset.py) and [train_sentence_transformers.py](src%2Ftrain_sentence_transformers.py)
+````
+python create_candidate_gen_dataset.py train_generated.jsonl --development_data_path dev_generated.jsonl
+````
+````
+python train_sentence_transformers.py candidate_retrieval_dataset candidate_retriever
+````
+4. Create an candidate index using [construct_entity_index.py](src%2Fconstruct_entity_index.py)
+````
+python construct_entity_index.py --el_embedder_name candidate_retriever/final --index_name entity_index
+````
+5. Train the cross-encoder using [train_ce_entity_linking_dataset.py](src%2Ftrain_ce_entity_linking_dataset.py) by supplying it with the created candidate index.
+````
+python train_ce_entity_linking_dataset.py train_generated.jsonl dev_generated.jsonl --candidate_retrieval_model candidate_retriever/final --entity_index entity_index.index --entity_mapping entity_index.json
+````
+
+# Running the method 
 Given all the generated files, indexes and models, the method can then be run on a list of texts using:
 [run.py](edc%2Frun.py).
 The method has several parameters that can be set via command line arguments. To reproduce the paper results, please set:

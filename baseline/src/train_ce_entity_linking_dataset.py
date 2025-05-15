@@ -168,9 +168,9 @@ def create_sft_data(context_candidates_list, add_mentions):
 
 
 
-def get_retrieval_elements(entity_index, entity_mapping) -> tuple:
+def get_retrieval_elements(entity_index, entity_mapping, candidate_retrieval_model) -> tuple:
 
-    model = SentenceTransformer("candidate_generation_v3/final", trust_remote_code=True)
+    model = SentenceTransformer(candidate_retrieval_model, trust_remote_code=True)
     faiss_index = faiss.read_index(entity_index)  # Replace with actual index
     index_mapping = json.load(open(entity_mapping))  # Replace with actual index mapping
     index_mapping = {int(k): v for k, v in index_mapping.items()}
@@ -202,8 +202,8 @@ def retrieve_candidates(entities,
 
 
 
-def prepare_context_candidates(data: List[Example], entity_index, entity_mapping):
-    model, candidate_index, candidate_mapping = get_retrieval_elements(entity_index, entity_mapping)
+def prepare_context_candidates(data: List[Example], entity_index, entity_mapping, candidate_retrieval_model):
+    model, candidate_index, candidate_mapping = get_retrieval_elements(entity_index, entity_mapping, candidate_retrieval_model)
 
     all_entities = []
     for item in data:
@@ -235,11 +235,7 @@ def prepare_context_candidates(data: List[Example], entity_index, entity_mapping
         for candidates in candidates_list:
             random.shuffle(candidates)
             if entity.qid not in candidates:
-                if with_none_case:
-                    label_id = "None"
-                    none_case_num += 1
-                else:
-                    continue
+                continue
             else:
                 label_id = candidates.index(entity.qid)
             candidate_reps = []
@@ -524,6 +520,7 @@ if __name__ == "__main__":
     argument_parser.add_argument("development_data_path", type=str)
     argument_parser.add_argument("output_path", type=str)
     argument_parser.add_argument("--add_mentions", action="store_true",)
+    argument_parser.add_argument("--candidate_retrieval_model", type=str, default="candidate_retriever/final")
     argument_parser.add_argument("--entity_index", type=str, default="entity_index.index")
     argument_parser.add_argument("--entity_mapping", type=str, default="entity_index.json")
 
@@ -535,14 +532,15 @@ if __name__ == "__main__":
 
     entity_index = args.entity_index
     entity_mapping = args.entity_mapping
+    candidate_retrieval_model = args.candidate_retrieval_model
 
 
     kg_container = KGContainer()
     train_data = load_data(args.training_data_path, kg_container)
     dev_data = load_data(args.development_data_path, kg_container)
 
-    context_candidates_list = prepare_context_candidates(train_data, entity_index, entity_mapping)
-    dev_context_candidates_list = prepare_context_candidates(dev_data, entity_index, entity_mapping)
+    context_candidates_list = prepare_context_candidates(train_data, entity_index, entity_mapping, candidate_retrieval_model)
+    dev_context_candidates_list = prepare_context_candidates(dev_data, entity_index, entity_mapping, candidate_retrieval_model)
 
     train_dataset = create_sft_data(context_candidates_list, args.add_mentions)
 
