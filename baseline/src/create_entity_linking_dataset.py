@@ -220,7 +220,6 @@ if __name__ == "__main__":
     argument_parser.add_argument("training_data_path", type=str)
 
     argument_parser.add_argument("--development_data_path", type=str)
-    argument_parser.add_argument("--test_data_path", type=str)
     argument_parser.add_argument("--model_path", type=str, default="meta-llama/Llama-3.1-8B-Instruct")
     argument_parser.add_argument("--with_none_case", action="store_true")
 
@@ -241,9 +240,9 @@ if __name__ == "__main__":
     dev_context_candidates_list = prepare_context_candidates(dev_data, True)
 
     create_sft_data(context_candidates_list,
-                    "el_rerank_v3_train", args.model_path, args.with_none_case)
+                    "el_rerank_train", args.model_path, args.with_none_case)
 
     create_sft_data(dev_context_candidates_list,
-                    "el_rerank_v3_dev", args.model_path, args.with_none_case)
+                    "el_rerank_dev", args.model_path, args.with_none_case)
 
 

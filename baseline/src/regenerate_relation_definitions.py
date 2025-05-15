@@ -1,18 +1,9 @@
-import dataclasses
 import json
-import multiprocessing
-import os
-from argparse import ArgumentParser
-from typing import List
-
-import torch
 from tqdm import tqdm
 
 from vllm import LLM, SamplingParams
 
-from src.data_utils import Example, load_data, KGContainer
-
-import jsonlines
+from src.data_utils import KGContainer
 
 
 def parse_output(output: str) -> dict:

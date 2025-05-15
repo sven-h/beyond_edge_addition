@@ -199,3 +199,9 @@ if __name__ == "__main__":
             "linked_triplets": mapped_linked_triplet,
         })
 
+    json.dump(
+        final_results,
+        open(os.path.join(data_path, f"iter{max_iter}", "linked_triplets.json"), "w"),
+        ensure_ascii=False,
+        indent=4,)
+

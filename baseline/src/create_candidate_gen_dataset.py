@@ -50,7 +50,6 @@ if __name__ == "__main__":
     argument_parser.add_argument("training_data_path", type=str)
     argument_parser.add_argument("--development_data_path", type=str)
     argument_parser.add_argument("--add_special_prompt", action="store_true", help="Add special prompt to the sentence")
-    argument_parser.add_argument("--test_data_path", type=str)
     argument_parser.add_argument("--output_path", type=str, default="candidate_gen_dataset/",)
     args = argument_parser.parse_args()
 

@@ -148,14 +148,10 @@ if __name__ == "__main__":
         default="intfloat/e5-mistral-7b-instruct",
         help="Embedding model used for entity linking. Has to be a sentence transformer. Please refer to https://sbert.net/",
     )
-    argparser.add_argument(
-        "--el_adapter_path",
-        default=None,
-        help="Path to adapter of entity linker.",
-    )
+
     argparser.add_argument("--model_type", default="vllm", help="Model type: vllm, hf, or sts")
     argparser.add_argument("--index_name", default="entity_index", help="Name of the index file to save")
-    kgc = KGContainer("data/ie_dataset_v3/")
+    kgc = KGContainer()
 
     args = argparser.parse_args()
     model_type = args.model_type

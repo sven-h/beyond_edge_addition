@@ -13,12 +13,9 @@ from sentence_transformers import SentenceTransformer, CrossEncoder, CrossEncode
 from sentence_transformers.cross_encoder.evaluation import CrossEncoderRerankingEvaluator
 from sentence_transformers.cross_encoder.losses import BinaryCrossEntropyLoss
 from tqdm import tqdm
-from transformers import AutoTokenizer
-from argparse import ArgumentParser
 from typing import List
 from datasets import Dataset,DatasetDict
 from src.data_utils import load_data, KGContainer, Example, create_full_entity_description
-from src.special_prompts import STS_PROMPT
 
 INSTRUCT = '''Entity Mention: {}\nEntity Mention Definition: {}\nEntity Mention Types: {}\n\nBased on the above entity mention and its context, identify the ID of the candidate in the following to which the entity mention refers:{}'''
 
