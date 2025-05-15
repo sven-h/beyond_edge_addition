@@ -6,7 +6,7 @@ from tqdm import tqdm
 from transformers import AutoTokenizer
 from typing import List
 from src.data_utils import load_data, KGContainer, Example, create_full_entity_description
-from src.train_ce_entity_linking_dataset import get_retrieval_elemsents
+from src.train_ce_entity_linking_dataset import get_retrieval_elements
 
 INSTRUCT = '''Entity Mention: {}\nEntity Mention Definition: {}\nEntity Mention Types: {}\n\nBased on the above entity mention and its context, identify the ID of the candidate in the following to which the entity mention refers:{}'''
 
@@ -148,8 +148,8 @@ def retrieve_candidates(entities,
 
 
 
-def prepare_context_candidates(data: List[Example], with_none_case=False):
-    model, candidate_index, candidate_mapping = get_retrieval_elemsents()
+def prepare_context_candidates(data: List[Example], entity_index, entity_mapping, with_none_case=False):
+    model, candidate_index, candidate_mapping = get_retrieval_elements(entity_index, entity_mapping)
 
     all_entities = []
     for item in data:
@@ -222,9 +222,14 @@ if __name__ == "__main__":
     argument_parser.add_argument("--development_data_path", type=str)
     argument_parser.add_argument("--model_path", type=str, default="meta-llama/Llama-3.1-8B-Instruct")
     argument_parser.add_argument("--with_none_case", action="store_true")
+    argument_parser.add_argument("--entity_index", type=str, default="entity_index.index")
+    argument_parser.add_argument("--entity_mapping", type=str, default="entity_index.json")
 
 
     args = argument_parser.parse_args()
+
+    entity_index = args.entity_index
+    entity_mapping = args.entity_mapping
 
     kg_container = KGContainer()
     train_data = load_data(args.training_data_path, kg_container)
@@ -236,8 +241,8 @@ if __name__ == "__main__":
     else:
         dev_data = load_data(args.development_data_path, kg_container)
 
-    context_candidates_list = prepare_context_candidates(train_data, True)
-    dev_context_candidates_list = prepare_context_candidates(dev_data, True)
+    context_candidates_list = prepare_context_candidates(train_data, entity_index, entity_mapping, True)
+    dev_context_candidates_list = prepare_context_candidates(dev_data, entity_index, entity_mapping, True)
 
     create_sft_data(context_candidates_list,
                     "el_rerank_train", args.model_path, args.with_none_case)

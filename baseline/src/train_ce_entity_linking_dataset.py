@@ -168,11 +168,11 @@ def create_sft_data(context_candidates_list, add_mentions):
 
 
 
-def get_retrieval_elemsents() -> tuple:
+def get_retrieval_elements(entity_index, entity_mapping) -> tuple:
 
     model = SentenceTransformer("candidate_generation_v3/final", trust_remote_code=True)
-    faiss_index = faiss.read_index("entity_index_v4.index")  # Replace with actual index
-    index_mapping = json.load(open("entity_index_v4.json"))  # Replace with actual index mapping
+    faiss_index = faiss.read_index(entity_index)  # Replace with actual index
+    index_mapping = json.load(open(entity_mapping))  # Replace with actual index mapping
     index_mapping = {int(k): v for k, v in index_mapping.items()}
 
     return model, faiss_index, index_mapping
@@ -202,8 +202,8 @@ def retrieve_candidates(entities,
 
 
 
-def prepare_context_candidates(data: List[Example], with_none_case=False):
-    model, candidate_index, candidate_mapping = get_retrieval_elemsents()
+def prepare_context_candidates(data: List[Example], entity_index, entity_mapping):
+    model, candidate_index, candidate_mapping = get_retrieval_elements(entity_index, entity_mapping)
 
     all_entities = []
     for item in data:
@@ -524,6 +524,8 @@ if __name__ == "__main__":
     argument_parser.add_argument("development_data_path", type=str)
     argument_parser.add_argument("output_path", type=str)
     argument_parser.add_argument("--add_mentions", action="store_true",)
+    argument_parser.add_argument("--entity_index", type=str, default="entity_index.index")
+    argument_parser.add_argument("--entity_mapping", type=str, default="entity_index.json")
 
 
     args = argument_parser.parse_args()
@@ -531,19 +533,16 @@ if __name__ == "__main__":
     tmp_train_file = args.training_data_path + ".pkl"
     tmp_dev_file = args.development_data_path + ".pkl"
 
-    if os.path.exists(tmp_train_file) and os.path.exists(tmp_dev_file):
-        context_candidates_list = pickle.load(open(tmp_train_file, "rb"))
-        dev_context_candidates_list = pickle.load(open(tmp_dev_file, "rb"))
-    else:
-        kg_container = KGContainer()
-        train_data = load_data(args.training_data_path, kg_container)
-        dev_data = load_data(args.development_data_path, kg_container)
+    entity_index = args.entity_index
+    entity_mapping = args.entity_mapping
 
-        context_candidates_list = prepare_context_candidates(train_data, False)
-        dev_context_candidates_list = prepare_context_candidates(dev_data, False)
 
-        pickle.dump(context_candidates_list, open(tmp_train_file, "wb"))
-        pickle.dump(dev_context_candidates_list, open(tmp_dev_file, "wb"))
+    kg_container = KGContainer()
+    train_data = load_data(args.training_data_path, kg_container)
+    dev_data = load_data(args.development_data_path, kg_container)
+
+    context_candidates_list = prepare_context_candidates(train_data, entity_index, entity_mapping)
+    dev_context_candidates_list = prepare_context_candidates(dev_data, entity_index, entity_mapping)
 
     train_dataset = create_sft_data(context_candidates_list, args.add_mentions)
 
