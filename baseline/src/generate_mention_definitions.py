@@ -167,9 +167,11 @@ if __name__ == "__main__":
     argparser = ArgumentParser()
     argparser.add_argument("input_file", type=str)
     argparser.add_argument("output_file", type=str)
+    argparser.add_argument("--kg_data_path", type=str, default="data/")
     argparser.add_argument("-n", type=int, default=1)
-    kg_container = KGContainer()
     args = argparser.parse_args()
+
+    kg_container = KGContainer(args.kg_data_path)
     examples = load_data(args.input_file, kg_container)
     # generate_definitions(examples, kg_container, args.output_file)
 

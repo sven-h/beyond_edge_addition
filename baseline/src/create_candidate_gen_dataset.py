@@ -51,9 +51,11 @@ if __name__ == "__main__":
     argument_parser.add_argument("--development_data_path", type=str)
     argument_parser.add_argument("--add_special_prompt", action="store_true", help="Add special prompt to the sentence")
     argument_parser.add_argument("--output_path", type=str, default="candidate_gen_dataset/",)
+    argument_parser.add_argument("--kg_data_path", type=str, default="data/")
+
     args = argument_parser.parse_args()
 
-    kg_container = KGContainer()
+    kg_container = KGContainer(args.kg_data_path)
     train_data = load_data(args.training_data_path, kg_container)
     if args.development_data_path is None:
         assert args.development_data_path is None, "Both dev should be provided or none of them."
