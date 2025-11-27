@@ -94,13 +94,13 @@ def generate_definitions(examples: List[Example], kg_container: KGContainer, out
 
         print(f"Ratio of missing entities: {missing_entities / overall_entities}")
 
-def generate_worker(gpu_id: int, batch_examples: List[Example], kg_container: KGContainer, output_file: str, n: int):
+def generate_worker(gpu_id: int, batch_examples: List[Example], kg_container: KGContainer, output_file: str, n: int, prompt_file: str):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
     model = LLM(model="meta-llama/Llama-3.1-8B-Instruct", max_model_len=4096)
 
     all_messages = []
     all_entity_labels = []
-    main_prompt = open("prompt.txt").read()
+    main_prompt = open(prompt_file).read()
 
     for example in tqdm(batch_examples, desc=f"GPU {gpu_id} prompt prep"):
         entity_labels = [kg_container.label(x.qid) for x in example.entities if x.qid in kg_container.entities]
@@ -168,6 +168,7 @@ if __name__ == "__main__":
     argparser.add_argument("input_file", type=str)
     argparser.add_argument("output_file", type=str)
     argparser.add_argument("--kg_data_path", type=str, default="data/")
+    argparser.add_argument("--prompt_file", type=str, default="prompt.txt")
     argparser.add_argument("-n", type=int, default=1)
     args = argparser.parse_args()
 
@@ -186,7 +187,7 @@ if __name__ == "__main__":
     for i in range(num_gpus):
         p = multiprocessing.Process(
             target=generate_worker,
-            args=(i, chunks[i], kg_container, args.output_file, args.n)
+            args=(i, chunks[i], kg_container, args.output_file, args.n, args.prompt_file)
         )
         p.start()
         processes.append(p)
