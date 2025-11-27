@@ -15,7 +15,8 @@ python train_sentence_transformers.py schema_gen_dataset schema_retriever
 2. Generate entity mention definitions using [generate_mention_definitions.py](src%2Fgenerate_mention_definitions.py)
 
 ````
-python generate_mention_definitions.py train.jsonl generated.jsonl
+python generate_mention_definitions.py train.jsonl train_generated.jsonl
+python generate_mention_definitions.py dev.jsonl dev_generated.jsonl
 ````
 
 3. Train the candidate retrieval using [create_candidate_gen_dataset.py](src%2Fcreate_candidate_gen_dataset.py) and [train_sentence_transformers.py](src%2Ftrain_sentence_transformers.py)
