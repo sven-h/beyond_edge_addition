@@ -7,7 +7,7 @@ Several steps are necessary to get a running method.
 Given the dataset, the following steps are necessary:
 1. Train the schema retriever using [create_schema_gen_dataset.py](src%2Fcreate_schema_gen_dataset.py) and [train_sentence_transformers.py](src%2Ftrain_sentence_transformers.py).
 ````
-python create_schema_gen_dataset.py train.json --development_data_path dev.json --add_special_prompt
+python create_schema_gen_dataset.py train.jsonl --development_data_path dev.jsonl --add_special_prompt
 ````
 ````
 python train_sentence_transformers.py schema_gen_dataset schema_retriever
