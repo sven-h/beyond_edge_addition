@@ -25,7 +25,7 @@ python create_candidate_gen_dataset.py train_generated.jsonl --development_data_
 ````
 python train_sentence_transformers.py candidate_retrieval_dataset candidate_retriever
 ````
-4. Create an candidate index using [construct_entity_index.py](src%2Fconstruct_entity_index.py)
+4. Create a candidate index using [construct_entity_index.py](src%2Fconstruct_entity_index.py)
 ````
 python construct_entity_index.py --el_embedder_name candidate_retriever/final --index_name entity_index
 ````
