@@ -191,7 +191,10 @@ def load_data(file_name: str, kgc: KGContainer) -> List[Example]:
                                 surface_form = None
                         definition = generated_entities[label]["definition"]
                         if isinstance(definition, list):
-                            definition = definition[0]
+                            if len(definition) > 0:
+                                definition = definition[0]
+                            else:
+                                definition = None
                         type_s = generated_entities[label].get("types", generated_entities[label].get("type", None))
                         if isinstance(type_s, list):
                             if len(type_s) > 0:
