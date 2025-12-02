@@ -523,6 +523,8 @@ if __name__ == "__main__":
     argument_parser.add_argument("--candidate_retrieval_model", type=str, default="candidate_retriever/final")
     argument_parser.add_argument("--entity_index", type=str, default="entity_index.index")
     argument_parser.add_argument("--entity_mapping", type=str, default="entity_index.json")
+    argument_parser.add_argument("--kg_data_path", type=str, default="data/")
+
 
 
     args = argument_parser.parse_args()
@@ -535,7 +537,7 @@ if __name__ == "__main__":
     candidate_retrieval_model = args.candidate_retrieval_model
 
 
-    kg_container = KGContainer()
+    kg_container = KGContainer(args.kg_data_path)
     train_data = load_data(args.training_data_path, kg_container)
     dev_data = load_data(args.development_data_path, kg_container)
 
