@@ -32,7 +32,7 @@ python construct_entity_index.py --el_embedder_name candidate_retriever/final --
 ````
 5. Train the cross-encoder using [train_ce_entity_linking_dataset.py](src%2Ftrain_ce_entity_linking_dataset.py) by supplying it with the created candidate index.
 ````
-python train_ce_entity_linking_dataset.py train_generated.jsonl dev_generated.jsonl --candidate_retrieval_model candidate_retriever/final --entity_index entity_index.index --entity_mapping entity_index.json
+python train_ce_entity_linking_dataset.py train_generated.jsonl dev_generated.jsonl crossencoder --candidate_retrieval_model candidate_retriever/final --entity_index entity_index.index --entity_mapping entity_index.json
 ````
 
 # Running the method 
