@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import random
 from collections import defaultdict
 from typing import List, Optional, Iterable
 
@@ -13,11 +12,11 @@ from tqdm import tqdm
 from vllm import LLM
 
 import edc.utils.llm_utils as llm_utils
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import numpy as np
 import faiss
 
-from src.create_entity_linking_dataset import formulate_candidates
+from src.preparation.create_entity_linking_dataset import formulate_candidates
 from src.data_utils import create_full_entity_description
 from src.special_prompts import STS_PROMPT
 

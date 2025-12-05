@@ -3,10 +3,10 @@ import os
 
 import jsonlines
 
-from src.create_initial_relation_schema import create_relation_schema_csv
-from src.create_test_txt import generate_text_file
+from src.preparation.create_initial_relation_schema import create_relation_schema_csv
+from src.preparation.create_test_txt import generate_text_file
 from src.data_utils import KGContainer
-from src.regenerate_relation_definitions import generate_definitions
+from src.preparation.regenerate_relation_definitions import generate_definitions
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description="Create relation schema CSV.")

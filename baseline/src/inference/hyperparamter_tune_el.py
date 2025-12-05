@@ -4,7 +4,7 @@ from edc.edc_framework import EDC
 import os
 import logging
 
-from src.evaluate import load_dataset
+from src.inference.evaluate import load_dataset
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -93,11 +93,6 @@ if __name__ == "__main__":
         help="Prompt template used for entity merging.",
     )
 
-    parser.add_argument("--me_threshold", default=0.5, type=float, help="Threshold for entity merging.")
-    parser.add_argument("--mm_threshold", default=0.5, type=float, help="Threshold for entity merging.")
-    parser.add_argument("--path_threshold", default=0.75, type=float, help="Threshold for entity merging.")
-
-
     # Input setting
     parser.add_argument(
         "--input_text_file_path",
@@ -157,6 +152,13 @@ if __name__ == "__main__":
         default=None,
     )
 
+    parser.add_argument("--me_threshold", default=0.5, type=float, help="Threshold for entity merging.")
+    parser.add_argument("--mm_threshold", default=0.5, type=float, help="Threshold for entity merging.")
+    parser.add_argument("--path_threshold", default=0.75, type=float, help="Threshold for entity merging.")
+
+    parser.add_argument("--iter_num", default=None, type=int)
+
+
 
     # Output setting
     parser.add_argument("--logging_verbose", action="store_const", dest="loglevel", const=logging.INFO)
@@ -168,10 +170,13 @@ if __name__ == "__main__":
 
     data_path = args["data_path"]
     # Find folder of name iter{n} with highest n
-    max_iter = -1
-    for folder in os.listdir(data_path):
-        if folder.startswith("iter") and folder[4:].isdigit():
-            max_iter = max(max_iter, int(folder[4:]))
+    if args["iter_num"] is not None:
+        max_iter = args["iter_num"]
+    else:
+        max_iter = -1
+        for folder in os.listdir(data_path):
+            if folder.startswith("iter") and folder[4:].isdigit():
+                max_iter = max(max_iter, int(folder[4:]))
 
     schema_dict_path = os.path.join(data_path, f"iter{max_iter}", "schema_dict.json")
     result_at_stage_path = os.path.join(data_path, f"iter{max_iter}", "result_at_each_stage.json")
@@ -184,24 +189,13 @@ if __name__ == "__main__":
         can_triplets_list.append(item["schema_canonicalizaiton"])
         input_text_list.append(item["input_text"])
 
-    linked_triplets_list = edc.do_linking(
+    ground_truth = list(load_dataset("data/ie_dataset_v3/val_dataset.jsonl"))
+
+    all_results = edc.do_hyper_parameter_tuning(
         input_text_list,
         can_triplets_list,
-        schema_dict
+        schema_dict,
+        ground_truth
     )
 
-    final_results = []
-    for idx in range(len(linked_triplets_list)):
-        mapped_linked_triplet = linked_triplets_list[idx]
-        final_results.append({
-            "index": idx,
-            "input_text": input_text_list[idx],
-            "linked_triplets": mapped_linked_triplet,
-        })
-
-    json.dump(
-        final_results,
-        open(os.path.join(data_path, f"iter{max_iter}", "linked_triplets.json"), "w"),
-        ensure_ascii=False,
-        indent=4,)
-
+    json.dump(all_results, open(f"hyper_parameter_tuning_results_{max_iter}.json", "w"), indent=4)

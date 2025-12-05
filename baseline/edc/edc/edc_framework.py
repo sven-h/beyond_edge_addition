@@ -8,14 +8,11 @@ from edc.schema_canonicalization import SchemaCanonicalizer
 from edc.entity_extraction import EntityExtractor
 import edc.utils.llm_utils as llm_utils
 from typing import List
-from edc.utils.e5_mistral_utils import MistralForSequenceEmbedding
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from edc.schema_retriever import SchemaRetriever
 from tqdm import tqdm
 import os
 import csv
 import pathlib
-from functools import partial
 import copy
 import logging
 from sentence_transformers import SentenceTransformer, CrossEncoder
@@ -24,7 +21,7 @@ import random
 import json
 
 from edc.entity_linking import EntityLinker
-from src.evaluate import evaluate
+from src.inference.evaluate import evaluate
 
 reload(logging)
 logger = logging.getLogger(__name__)

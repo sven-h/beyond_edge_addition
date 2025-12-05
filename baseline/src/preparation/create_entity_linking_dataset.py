@@ -6,7 +6,7 @@ from tqdm import tqdm
 from transformers import AutoTokenizer
 from typing import List
 from src.data_utils import load_data, KGContainer, Example, create_full_entity_description
-from src.train_ce_entity_linking_dataset import get_retrieval_elements
+from src.training.train_ce_entity_linking_dataset import get_retrieval_elements
 
 INSTRUCT = '''Entity Mention: {}\nEntity Mention Definition: {}\nEntity Mention Types: {}\n\nBased on the above entity mention and its context, identify the ID of the candidate in the following to which the entity mention refers:{}'''
 
