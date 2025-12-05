@@ -130,9 +130,9 @@ if __name__ == "__main__":
         help="Path to the entity linking mapping.",
     )
 
-    parser.add_argument("--me_threshold", default=0.5, type=float, help="Threshold for entity merging.")
-    parser.add_argument("--mm_threshold", default=0.5, type=float, help="Threshold for entity merging.")
-    parser.add_argument("--path_threshold", default=0.75, type=float, help="Threshold for entity merging.")
+    parser.add_argument("--me_threshold", default=0.1, type=float, help="Threshold for entity merging.")
+    parser.add_argument("--mm_threshold", default=0.9, type=float, help="Threshold for entity merging.")
+    parser.add_argument("--path_threshold", default=0.3, type=float, help="Threshold for entity merging.")
 
     parser.add_argument(
         "--el_disambiguator",
