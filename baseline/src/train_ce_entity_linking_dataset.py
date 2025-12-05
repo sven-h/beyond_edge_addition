@@ -172,6 +172,8 @@ def get_retrieval_elements(entity_index, entity_mapping, candidate_retrieval_mod
 
     model = SentenceTransformer(candidate_retrieval_model, trust_remote_code=True)
     faiss_index = faiss.read_index(entity_index)  # Replace with actual index
+    res = faiss.StandardGpuResources()  # initialize GPU resources
+    faiss_index = faiss.index_cpu_to_gpu(res, 0, faiss_index)
     index_mapping = json.load(open(entity_mapping))  # Replace with actual index mapping
     index_mapping = {int(k): v for k, v in index_mapping.items()}
 
@@ -190,20 +192,24 @@ def retrieve_candidates(entities,
         prompts.append(prompt)
 
     embeddings = model.encode(prompts, show_progress_bar=True, normalize_embeddings=True)
-    nearest_indices = candidate_index.search(embeddings, 2 * CANDIDATE_NUM)[1]
+    print("Searching candidates")
     all_candidates = []
-    for nearest_indices_ in nearest_indices:
-        candidates = set()
-        for idx in nearest_indices_:
-            if idx in candidate_mapping:
-                candidates.add(candidate_mapping[idx]["identifier"])
-        all_candidates.append(candidates)
+    batch_size = 1024  # tune to your GPU/CPU memory
+    for i in tqdm(range(0, len(embeddings), batch_size)):
+        batch_embeddings = embeddings[i:i + batch_size]
+        _, idx = candidate_index.search(batch_embeddings, 2 * CANDIDATE_NUM)
+        for indices in idx:
+            candidates = {candidate_mapping[j]["identifier"] for j in indices if j in candidate_mapping}
+            all_candidates.append(candidates)
+
+    print("Candidates retrieved")
     return all_candidates
 
 
 
 def prepare_context_candidates(data: List[Example], entity_index, entity_mapping, candidate_retrieval_model):
     model, candidate_index, candidate_mapping = get_retrieval_elements(entity_index, entity_mapping, candidate_retrieval_model)
+    faiss.omp_set_num_threads(8)
 
     all_entities = []
     for item in data:
@@ -214,6 +220,7 @@ def prepare_context_candidates(data: List[Example], entity_index, entity_mapping
     all_candidates = retrieve_candidates(
                 all_entities,
                 model, candidate_index, candidate_mapping)
+
     none_case_num = 0
     context_candidates_list = []
     counter = 0
@@ -470,7 +477,7 @@ def train(train_dataset, dev_dataset, output_path):
     train_dataset = transform_data(train_dataset)
     dev_dataset = transform_data(dev_dataset)
 
-    total_steps = len(train_dataset) // 128 * 1
+    total_steps = len(train_dataset) // 64 * 1
 
     train_dataset = Dataset.from_list(train_dataset)
     dev_dataset = Dataset.from_list(dev_dataset)
@@ -480,8 +487,8 @@ def train(train_dataset, dev_dataset, output_path):
     args = CrossEncoderTrainingArguments(
         output_dir=f"models/{output_path}",
         num_train_epochs=3,
-        per_device_train_batch_size=128,
-        per_device_eval_batch_size=128,
+        per_device_train_batch_size=64,
+        per_device_eval_batch_size=64,
         learning_rate=2e-5,
         warmup_ratio=0.1,
         fp16=False,  # Set to False if you get an error that your GPU can't run on FP16
@@ -509,6 +516,7 @@ def train(train_dataset, dev_dataset, output_path):
         loss=loss,
         evaluator=evaluator,
     )
+    print("Starting training")
     trainer.train()
 
     trainer.save_model(f"models/{output_path}/final")
@@ -536,17 +544,24 @@ if __name__ == "__main__":
     entity_mapping = args.entity_mapping
     candidate_retrieval_model = args.candidate_retrieval_model
 
+    dump_path = args.output_path + "data.pkl"
+    if os.path.exists(dump_path):
+        with open(dump_path, 'rb') as fp:
+            train_dataset, dev_dataset = pickle.load(fp)
+    else:
+        kg_container = KGContainer(args.kg_data_path)
+        train_data = load_data(args.training_data_path, kg_container)
+        dev_data = load_data(args.development_data_path, kg_container)
 
-    kg_container = KGContainer(args.kg_data_path)
-    train_data = load_data(args.training_data_path, kg_container)
-    dev_data = load_data(args.development_data_path, kg_container)
+        context_candidates_list = prepare_context_candidates(train_data, entity_index, entity_mapping, candidate_retrieval_model)
+        dev_context_candidates_list = prepare_context_candidates(dev_data, entity_index, entity_mapping, candidate_retrieval_model)
 
-    context_candidates_list = prepare_context_candidates(train_data, entity_index, entity_mapping, candidate_retrieval_model)
-    dev_context_candidates_list = prepare_context_candidates(dev_data, entity_index, entity_mapping, candidate_retrieval_model)
+        train_dataset = create_sft_data(context_candidates_list, args.add_mentions)
 
-    train_dataset = create_sft_data(context_candidates_list, args.add_mentions)
+        dev_dataset = create_sft_data(dev_context_candidates_list, args.add_mentions)
 
-    dev_dataset = create_sft_data(dev_context_candidates_list, args.add_mentions)
+        with open(dump_path, 'wb') as fp:
+            pickle.dump((train_dataset, dev_dataset), fp)
 
     train(train_dataset, dev_dataset, args.output_path)
 

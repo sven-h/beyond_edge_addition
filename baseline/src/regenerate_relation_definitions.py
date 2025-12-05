@@ -1,3 +1,4 @@
+import argparse
 import json
 from tqdm import tqdm
 
@@ -78,7 +79,11 @@ def generate_definitions(relations, batch_size: int = 50000):
 
 
 if __name__ == "__main__":
-    kg_container = KGContainer()
+    argparser = argparse.ArgumentParser(description="Create relation schema CSV.")
+    argparser.add_argument("kg_data_path", type=str, help="Path to the knowledge graph data.", default="data")
+    args = argparser.parse_args()
+    kg_container = KGContainer(args.kg_data_path)
+
     relations = kg_container.relations.values()
     generate_definitions(relations)
 

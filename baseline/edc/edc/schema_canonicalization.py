@@ -42,7 +42,7 @@ class SchemaCanonicalizer:
         self.schema_dict = target_schema_dict
         self.target_kg_schema_dict = target_kg_schema_dict
 
-        self.alternative_definitions = json.load(open("data/relation_definitions.json", "r"))
+        self.alternative_definitions = json.load(open("../data/relation_definitions.json", "r"))
 
 
         self.embedder = embedder

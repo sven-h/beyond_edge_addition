@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import random
 from collections import defaultdict
 from typing import List, Optional, Iterable
@@ -27,7 +28,7 @@ class EntityLinker:
     def __init__(self, sentence_encoder: SentenceTransformer,
                  entity_index: faiss.Index, index_to_entity: dict , internal_entities: list,
                  model: AutoModelForCausalLM = None, tokenizer: AutoTokenizer = None, openai_model=None, disambiguator_model: CrossEncoder=None, cluster=False,
-                 me_threshold=0.5, mm_threshold=0.5, path_threshold=0.75,
+                 me_threshold=0.5, mm_threshold=0.5, path_threshold=0.75, prompt_path: str = "data"
                  ) -> None:
         # The canonicalizer uses an embedding model to first fetch candidates from the target schema, then uses a verifier schema to decide which one to canonicalize to or not
         # canonoicalize at all.
@@ -51,10 +52,10 @@ class EntityLinker:
         self.sentence_encoder = sentence_encoder
         self.entity_index = entity_index
         self.index_to_entity = index_to_entity
-        self.entity_disambiguation_prompt = open("./data/entity_disambiguation_prompt.txt").read()
-        self.finetuned_entity_disambiguation_prompt = open("./data/finetuned_entity_disambiguation_prompt.txt").read()
-        self.entity_description_prompt = open("./data/entity_description_prompt.txt").read()
-        self.entity_description_few_shot_examples = open("./data/entity_description_few_shot_examples.txt").read()
+        self.entity_disambiguation_prompt = open(os.path.join(prompt_path, "entity_disambiguation_prompt.txt")).read()
+        self.finetuned_entity_disambiguation_prompt = open(os.path.join(prompt_path,"finetuned_entity_disambiguation_prompt.txt")).read()
+        self.entity_description_prompt = open(os.path.join(prompt_path, "entity_description_prompt.txt")).read()
+        self.entity_description_few_shot_examples = open(os.path.join(prompt_path, "entity_description_few_shot_examples.txt")).read()
         # self.entity_disambiguation_few_shot_examples = open("data/entity_disambiguation_few_shot_examples.txt").read()
         self.internal_entity_reps = self.initialize_internal_reps(internal_entities)
 

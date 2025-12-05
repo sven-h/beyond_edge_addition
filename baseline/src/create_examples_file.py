@@ -1,3 +1,4 @@
+import argparse
 import json
 from collections import defaultdict
 
@@ -5,7 +6,10 @@ from src.data_utils import KGContainer, load_data
 
 
 def main():
-    kg_container = KGContainer("data/")
+    argparser = argparse.ArgumentParser(description="Create relation schema CSV.")
+    argparser.add_argument("kg_data_path", type=str, help="Path to the knowledge graph data.", default="data")
+    args = argparser.parse_args()
+    kg_container = KGContainer(args.kg_data_path)
 
     path = "train_dataset.jsonl"
 

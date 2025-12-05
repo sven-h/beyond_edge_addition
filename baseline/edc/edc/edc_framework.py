@@ -61,6 +61,7 @@ class EDC:
         self.el_mapping = edc_configuration["el_mapping"]
         self.me_threshold = edc_configuration["me_threshold"]
         self.mm_threshold = edc_configuration["mm_threshold"]
+        self.el_prompt_path = edc_configuration["el_prompt_path"]
         self.path_threshold = edc_configuration["path_threshold"]
         self.el_disambiguator_name = edc_configuration["el_disambiguator"]
         self.el_adapter_path = edc_configuration["el_adapter_path"]
@@ -275,7 +276,7 @@ class EDC:
                                      openai_model=openai_model,
                                      disambiguator_model=el_disambiguator, cluster=self.cluster,
                                      me_threshold=self.me_threshold, mm_threshold=self.mm_threshold,
-                                     path_threshold=self.path_threshold,)
+                                     path_threshold=self.path_threshold, prompt_path=self.el_prompt_path)
         return entity_linker
     def entity_linking(self,
         input_text_list: List[str],
