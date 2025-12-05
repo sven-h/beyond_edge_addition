@@ -2,12 +2,17 @@ import jsonlines
 
 
 def main():
-
-    path = "test_dataset.jsonl"
+    argparser = argparse.ArgumentParser(description="Create test.txt from test_dataset.jsonl.")
+    argparser.add_argument(
+        "--input_path",
+        type=str,
+        default="test_dataset.jsonl",
+        help="Path to the input JSONL file.")
+    args = argparser.parse_args()
 
     output_file = open("test.txt", "w")
 
-    for item in jsonlines.open(path, "r"):
+    for item in jsonlines.open(args.input_path, "r"):
         output_file.write(item["text"] + "\n")
 
 
