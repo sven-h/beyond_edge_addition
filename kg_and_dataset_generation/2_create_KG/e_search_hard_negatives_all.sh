@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sbatch e_search_hard_negatives_submit.sh label_instances
+sbatch e_search_hard_negatives_submit.sh description_instances
