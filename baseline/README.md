@@ -4,7 +4,8 @@ It relies on code from the NASTyLinker method (https://github.com/nheist/CaLiGra
 
 ## Preparation
 Several steps are necessary to get a running method. 
-Given the dataset, the following steps are necessary:
+Given the dataset, put the extracted files into the data directory. 
+Then the following steps are necessary:
 1. Train the schema retriever using [create_schema_gen_dataset.py](src%2Fcreate_schema_gen_dataset.py) and [train_sentence_transformers.py](src%2Ftrain_sentence_transformers.py).
 ````
 python create_schema_gen_dataset.py train.jsonl --development_data_path dev.jsonl --add_special_prompt
@@ -36,6 +37,13 @@ python train_ce_entity_linking_dataset.py train_generated.jsonl dev_generated.js
 ````
 
 # Running the method 
+For evaluation the EDC framework expects several files to be present.
+These can be generated using [prepare_edc_run.py](src%2Fprepare_edc_run.py). A GPU is necessary to run this script:
+````
+python prepare_edc_run.py --test_data_input_path test_dataset.jsonl --kg_data_path data --prompts_path data
+````
+
+
 Given all the generated files, indexes and models, the method can then be run on a list of texts using:
 [run.py](edc%2Frun.py).
 The method has several parameters that can be set via command line arguments. To reproduce the paper results, please set:
@@ -43,6 +51,13 @@ The method has several parameters that can be set via command line arguments. To
 - `--initial_refine` (flag)
 - `--refinement_iterations` (2)
 - `--enrich_schema` (flag)
+
+Furthermore, provide all the previously trained model checkpoints and indices via:
+- `--sr_embedder` 
+- `--el_index`
+- `--el_mapping` 
+- `--el_embedder` 
+- `--el_disambiguator`
 
 If the relation canonicalization of new relations shall be disabled, do not set `--enrich_schema`. 
 
