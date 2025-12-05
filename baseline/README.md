@@ -2,6 +2,8 @@
 This directory contains the baseline model.
 It relies on code from the NASTyLinker method (https://github.com/nheist/CaLiGraph) as well as code from the EDC framework (https://github.com/clear-nus/edc).
 
+For reproducing the results we also provide the trained models at: https://zenodo.org/records/17828636?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjFiODg2YTk2LWJjNjktNDkwZS1iMjkwLTA1NjVkZThhZWJhNSIsImRhdGEiOnt9LCJyYW5kb20iOiJmNTBmZDUzMDRiZjdjMjEzNGJkZDA1OWRlMTNiN2M4OSJ9.APtFa6LtvzdSCzrenfGWrRwQgBNA3vNmR-whULDzCI9dii8suOQ1jWJQhzTGg0TqgQIn-mUuhbl7JKfgxwP_Ag
+
 ## Preparation
 Several steps are necessary to get a running method. 
 Given the dataset, put the extracted files into the data directory. 
