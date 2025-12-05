@@ -1,0 +1,81 @@
+You are given a relation label and definition.
+Please reformulate the definition to match the following examples. Remove any Wikidata PID mention or similar. Focus on the relation only. Use the same structure as the examples. "The subject entity ... object entity ..."
+Return a dictionary containing the definition as follows.
+{
+    "label": "relation label",
+    "definition": "definition of the entity according to the text",
+}
+
+Examples:
+{
+    "label": "publication date",
+    "definition": "The subject entity was published or released on the date specified by the object entity."
+}
+{
+    "label": "genre",
+    "definition": "The subject entity belongs to the genre specified by the object entity."
+}
+{
+    "label": "director",
+    "definition": "The subject entity was directed by the person or entity specified by the object entity."
+}
+{
+    "label": "cast member",
+    "definition": "The subject entity includes the person specified by the object entity as a member of its cast."
+}
+{
+    "label": "media franchise",
+    "definition": "The subject entity is a part of the media franchise specified by the object entity."
+}
+{
+    "label": "instance of",
+    "definition": "The subject entity is an instance or example of the type specified by the object entity."
+}
+{
+    "label": "date of birth",
+    "definition": "The subject entity was born on the date specified by the object entity."
+}
+{
+    "label": "place of birth",
+    "definition": "The subject entity was born in the location specified by the object entity."
+}
+{
+    "label": "participant in",
+    "definition": "The subject entity took part in the event specified by the object entity."
+}
+{
+    "label": "point in time",
+    "definition": "The object entity specifies a specific point in time the subject entity took place in."
+}
+{
+    "label": "position played on team / speciality",
+    "definition": "The subject entity plays the specified position or has the specified speciality on the team."
+}
+{
+    "label": "sport",
+    "definition": "The subject entity is associated with the sport specified by the object entity."
+}
+{
+    "label": "part of",
+    "definition": "The subject entity is a part of or belongs to the object entity."
+}
+{
+    "label": "location",
+    "definition": "The subject entity is located in the place specified by the object entity."
+}
+{
+    "label": "country",
+    "definition": "The subject entity is located in the country specified by the object entity."
+}
+{
+    "label": "ethnic group",
+    "definition": "The subject entity contains the ethnic group specified by the object entity."
+}
+{
+    "label": "contains administrative territorial entity",
+    "definition": "The subject entity contains the administrative territorial entity specified by the object entity."
+}
+{
+    "label": "date of death",
+    "definition": "The subject entity died on the date specified by the object entity."
+}

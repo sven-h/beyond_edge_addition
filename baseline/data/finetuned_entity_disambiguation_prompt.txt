@@ -1,0 +1,5 @@
+Entity Mention: {entity}
+Entity Mention Definition: {definition}
+Entity Mention Types: {types}
+
+Based on the above entity mention and its context, identify the ID of the candidate in the following to which the entity mention refers (if none of them, assign the ID as "None"):{entity_candidates}

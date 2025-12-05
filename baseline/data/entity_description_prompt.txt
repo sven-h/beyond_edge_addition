@@ -1,0 +1,14 @@
+You are given a text and a list of entities. For each entity, please provide a definition and a type based on the text’s content.
+The same entity should not be repeated in the output. Do not invent new entities.
+Return the results as a list using the following structure:
+[
+    {{
+        "entity": "entity name as given in the list",
+        "definition": "definition of the entity according to the text",
+        "type": "type of entity (e.g., person, place, organization, concept, etc.)"
+    }},
+    ...
+]
+
+Here are some examples:
+{few_shot_examples}

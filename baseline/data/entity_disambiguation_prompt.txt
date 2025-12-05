@@ -1,0 +1,5 @@
+Given is a description of an entity with label, potential definition and type. Furthermore, a numbered list of candidates is given.
+Return the number of the candidate which the entity most likely refers to. Consider the label, the type(s) and the definition (in this order). If none of them fit, return only “None”. State only the number of the correct candidate or “None”. Do not add any additional text.
+Entity: {entity_rep}
+Candidates:
+{entity_candidates}

@@ -1,0 +1,88 @@
+You are given a text and a list of entities. For each entity, please extract the surface form as it appears in the text, and provide a definition based on the text’s content.
+Note: The surface form does not need to match a contiguous span—it may consist of multiple words from different parts of the text.
+
+Return the results as a list using the following structure:
+[
+    {
+        "entity": "entity name",
+        "surface_form": "surface form as it appears in the text",
+        "definition": "definition of the entity according to the text",
+        "type": "type of entity (e.g., person, place, organization, concept, etc.)"
+    },
+    ...
+]
+
+Examples:
+
+Text:The Nile, the longest river in Africa, flows through eleven countries including Egypt and Sudan. It has been a vital source of water, transportation, and sustenance for civilizations since ancient times.
+Entities: Nile, Egypt, transportation
+Output:
+[
+    {
+        "entity": "Nile",
+        "surface_form": "The Nile",
+        "definition": "the longest river in Africa that flows through eleven countries and has historically provided water, transportation, and sustenance"
+        "type": "river"
+    },
+    {
+        "entity": "Egypt",
+        "surface_form": "Egypt",
+        "definition": "one of the eleven countries through which the Nile flows",
+        "type": "country"
+    },
+    {
+        "entity": "transportation",
+        "surface_form": "source of transportation",
+        "definition": "a function of the Nile, which has served as a means for moving goods and people since ancient times",
+        "type": "concept"
+    }
+]
+
+Text: Marie Curie, who conducted pioneering research on radioactivity, was the first woman to win a Nobel Prize and remains the only person to win Nobel Prizes in two different scientific fields.
+Entities: Marie Curie, Nobel Prize, different scientific fields
+Output:
+[
+    {
+        "entity": "Marie Curie",
+        "surface_form": "Marie Curie",
+        "definition": "a pioneering researcher on radioactivity and the first woman to win a Nobel Prize",
+        "type": "person"
+    },
+    {
+        "entity": "Nobel Prize",
+        "surface_form": "Nobel Prizes in two different scientific fields",
+        "definition": "awards that Marie Curie uniquely received in both physics and chemistry",
+        "type": "award"
+    },
+    {
+        "entity": "different scientific fields",
+        "surface_form": "two different scientific fields",
+        "definition": "the distinct disciplines in which Marie Curie was awarded Nobel Prizes, namely physics and chemistry",
+        "type": "concept"
+    }
+]
+
+Text: In Greek mythology, the phoenix is a bird that cyclically regenerates or is otherwise born again. Associated with the sun, the phoenix obtains new life by rising from the ashes of its predecessor.
+Entities: phoenix, sun, ashes
+Output:
+[
+    {
+        "entity": "phoenix",
+        "surface_form": "the phoenix",
+        "definition": "a mythological bird that regenerates by rising from the ashes of its predecessor",
+        "type": "mythological creature"
+    },
+    {
+        "entity": "sun",
+        "surface_form": "the sun",
+        "definition": "a celestial body associated with the phoenix in Greek mythology",
+        "type": "celestial body"
+    },
+    {
+        "entity": "ashes",
+        "surface_form": "ashes of its predecessor",
+        "definition": "the remains from which the phoenix is reborn",
+        "type": "substance"
+    }
+]
+
