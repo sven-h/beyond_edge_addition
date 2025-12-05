@@ -20,14 +20,14 @@ def parse_output(output: str) -> dict:
         else:
             return {}
     return {}
-def generate_definitions(relations, batch_size: int = 50000):
+def generate_definitions(relations, prompt_path: str, output_path: str, batch_size: int = 50000):
     model = "meta-llama/Llama-3.1-8B-Instruct"  # Choose any available model
     model = LLM(model=model, max_model_len=4096) # dtype=torch.bfloat16, trust_remote_code=True, quantization="bitsandbytes",
                 # load_format="bitsandbytes", ,)
 
     all_messages = []
     all_relations = []
-    main_prompt = open("data/re_prompt.txt").read()
+    main_prompt = open(prompt_path).read()
     for relation in tqdm(relations):
         user_prompt = f"{relation.label}: {relation.definition}"
         messages = [{"role":"system","content":main_prompt},{"role":"user","content":user_prompt}]
@@ -70,7 +70,7 @@ def generate_definitions(relations, batch_size: int = 50000):
     print(f"Number of relations not regenerated: {not_regen/count}")
     json.dump(
         relation_to_new_description,
-        open("data/relation_definitions.json", "w"),
+        open(output_path, "w"),
         ensure_ascii=False,
         indent=4,
     )
@@ -80,11 +80,11 @@ def generate_definitions(relations, batch_size: int = 50000):
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(description="Create relation schema CSV.")
-    argparser.add_argument("kg_data_path", type=str, help="Path to the knowledge graph data.", default="data")
+    argparser.add_argument("--kg_data_path", type=str, help="Path to the knowledge graph data.", default="data")
     args = argparser.parse_args()
     kg_container = KGContainer(args.kg_data_path)
 
     relations = kg_container.relations.values()
-    generate_definitions(relations)
+    generate_definitions(relations, "data/re_prompt.txt", "data/relation_definitions.json")
 
 
