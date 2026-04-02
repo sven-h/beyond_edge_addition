@@ -1,4 +1,3 @@
-import json
 import argparse
 import random
 
@@ -7,6 +6,7 @@ from transformers import AutoTokenizer
 from typing import List
 from src.data_utils import load_data, KGContainer, Example, create_full_entity_description
 from src.training.train_ce_entity_linking_dataset import get_retrieval_elements
+from src.utils import load_json_data, load_jsonl_data, dump_json_data, shorten_entity_description, formulate_candidates, is_length_valid
 
 INSTRUCT = '''Entity Mention: {}\nEntity Mention Definition: {}\nEntity Mention Types: {}\n\nBased on the above entity mention and its context, identify the ID of the candidate in the following to which the entity mention refers:{}'''
 
@@ -14,72 +14,6 @@ INSTRUCT_WITH_NONE_CASE = '''Entity Mention: {}\nEntity Mention Definition: {}\n
 
 
 CANDIDATE_NUM = 10
-
-MAX_INPUT_LENGTH = 4000
-
-
-def load_json_data(path):
-    with open(path, 'r', encoding='utf-8') as fp:
-        data = json.load(fp)
-    return data
-
-
-def load_jsonl_data(path):
-    data = []
-    with open(path, 'r', encoding='utf-8') as fp:
-        for line in fp:
-            obj = json.loads(line.strip())
-            data.append(obj)
-    return data
-
-
-def dump_json_data(data, path):
-    with open(path, 'w', encoding='utf-8') as fp:
-        json.dump(data, fp, ensure_ascii=True,
-                  indent=2, separators=(", ", ": "))
-
-
-def shorten_entity_description(entity_description, max_len):
-    entity_description_tokens = entity_description.split(" ")
-    entity_description = ' '.join(entity_description_tokens[: max_len])
-    return entity_description
-
-
-def formulate_candidates(candidate_list, max_len):
-    candidates = ""
-    candidate_template = '\n\nID: {}\nEntity: {}\nEntity Description: {}\nEntity Types: {}'
-    random.shuffle(candidate_list)
-    for i, candidate_obj in enumerate(candidate_list):
-        entity_description = shorten_entity_description(
-            candidate_obj["entity_description"], max_len)
-        candidate = candidate_template.format(
-            i, candidate_obj["title"], entity_description, ", ".join(candidate_obj["entity_types"]))
-        candidates += candidate
-
-    return candidates
-
-
-def is_length_valid(model_path, human_value, gpt_value, tokenizer):
-    messages = [
-        {"role": "user", "content": human_value},
-        {"role": "assistant", "content": gpt_value}
-    ]
-    prompt = tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
-    # vicuna_convo = get_conversation_template(model_path)
-    # vicuna_convo.append_message(vicuna_convo.roles[0], human_value)
-    # vicuna_convo.append_message(vicuna_convo.roles[1], gpt_value)
-    # prompt = vicuna_convo.get_prompt()
-
-    inputs = tokenizer([prompt])
-    input_length = len(inputs["input_ids"][0])
-
-    if random.randint(1, 100) == 1:
-        print(f"vicuna input length + output length = {input_length}")
-
-    if input_length > MAX_INPUT_LENGTH:
-        return False
-
-    return True
 
 
 def create_sft_data(context_candidates_list, sft_data_path, model_path, with_none_case=False):
