@@ -86,7 +86,7 @@ class CustomMultipleNegativesRankingLoss(MultipleNegativesRankingLoss):
 
 
 
-def train(dataset, model_name: str, batch_size: int, epochs: int, output_dir: str, lr: float = 2e-5):
+def train(dataset, model_name: str, batch_size: int, epochs: int, output_dir: str, lr: float = 2e-5, warmup_ratio: float = 0.1, num_workers: int = 10):
     # 1. Load a model to finetune with 2. (Optional) model card data
     torch.set_float32_matmul_precision("high")
     model = SentenceTransformer(
@@ -110,7 +110,7 @@ def train(dataset, model_name: str, batch_size: int, epochs: int, output_dir: st
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         learning_rate=lr,
-        warmup_ratio=0.1,
+        warmup_ratio=warmup_ratio,
         fp16=True,  # Set to False if you get an error that your GPU can't run on FP16
         bf16=False,  # Set to True if you have a GPU that supports BF16
         # batch_sampler=BatchSamplers.NO_DUPLICATES,
@@ -122,7 +122,7 @@ def train(dataset, model_name: str, batch_size: int, epochs: int, output_dir: st
         save_total_limit=2,
         logging_steps=100,
         run_name=output_dir,  # Will be used in W&B if `wandb` is installed
-        dataloader_num_workers=10,
+        dataloader_num_workers=num_workers,
     )
 
     query_to_id = {}
@@ -211,14 +211,12 @@ if __name__ == "__main__":
         default=1,
         help="Number of updates steps to accumulate before performing a backward/update pass.",
     )
-
-
+    parser.add_argument("--warmup_ratio", type=float, default=0.1, help="Warmup ratio for learning rate scheduler.")
+    parser.add_argument("--num_workers", type=int, default=10, help="Number of dataloader worker processes.")
 
     args = parser.parse_args()
 
-
     dataset = DatasetDict.load_from_disk(args.dataset_dir)
-
 
     # Train the model
     train(
@@ -228,4 +226,6 @@ if __name__ == "__main__":
         epochs=args.epochs,
         output_dir=args.output_dir,
         lr=args.lr,
+        warmup_ratio=args.warmup_ratio,
+        num_workers=args.num_workers,
     )

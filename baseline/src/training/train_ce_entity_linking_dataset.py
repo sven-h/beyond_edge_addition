@@ -374,9 +374,9 @@ class CustomCrossEncoderRerankingEvaluator(CrossEncoderRerankingEvaluator):
         return metrics
 
 
-def train(train_dataset, dev_dataset, output_path):
+def train(train_dataset, dev_dataset, output_path, model_name: str = "roberta-base", epochs: int = 3, batch_size: int = 64, lr: float = 2e-5, warmup_ratio: float = 0.1, seed: int = 12):
     model = CrossEncoder(
-        model_name_or_path="roberta-base")
+        model_name_or_path=model_name)
 
     loss = BinaryCrossEntropyLoss(
         model
@@ -414,20 +414,18 @@ def train(train_dataset, dev_dataset, output_path):
     train_dataset = transform_data(train_dataset)
     dev_dataset = transform_data(dev_dataset)
 
-    total_steps = len(train_dataset) // 64 * 1
+    total_steps = len(train_dataset) // batch_size * 1
 
     train_dataset = Dataset.from_list(train_dataset)
     dev_dataset = Dataset.from_list(dev_dataset)
 
-
-
     args = CrossEncoderTrainingArguments(
         output_dir=f"models/{output_path}",
-        num_train_epochs=3,
-        per_device_train_batch_size=64,
-        per_device_eval_batch_size=64,
-        learning_rate=2e-5,
-        warmup_ratio=0.1,
+        num_train_epochs=epochs,
+        per_device_train_batch_size=batch_size,
+        per_device_eval_batch_size=batch_size,
+        learning_rate=lr,
+        warmup_ratio=warmup_ratio,
         fp16=False,  # Set to False if you get an error that your GPU can't run on FP16
         bf16=True,  # Set to True if you have a GPU that supports BF16
         eval_strategy="steps",
@@ -441,7 +439,7 @@ def train(train_dataset, dev_dataset, output_path):
         logging_first_step=True,
         run_name="el",  # Will be used in W&B if `wandb` is installed
         disable_tqdm=False,
-        seed=12,
+        seed=seed,
     )
 
     # 6. Create the trainer & start training
@@ -464,11 +462,17 @@ if __name__ == "__main__":
     argument_parser.add_argument("training_data_path", type=str)
     argument_parser.add_argument("development_data_path", type=str)
     argument_parser.add_argument("output_path", type=str)
-    argument_parser.add_argument("--add_mentions", action="store_true",)
+    argument_parser.add_argument("--add_mentions", action="store_true")
     argument_parser.add_argument("--candidate_retrieval_model", type=str, default="candidate_retriever/final")
     argument_parser.add_argument("--entity_index", type=str, default="entity_index.index")
     argument_parser.add_argument("--entity_mapping", type=str, default="entity_index.json")
     argument_parser.add_argument("--kg_data_path", type=str, default="data/")
+    argument_parser.add_argument("--model_name", type=str, default="roberta-base", help="Cross-encoder model name")
+    argument_parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")
+    argument_parser.add_argument("--batch_size", type=int, default=64, help="Per-device train/eval batch size")
+    argument_parser.add_argument("--lr", type=float, default=2e-5, help="Learning rate")
+    argument_parser.add_argument("--warmup_ratio", type=float, default=0.1, help="Warmup ratio")
+    argument_parser.add_argument("--seed", type=int, default=12, help="Random seed")
 
 
 
@@ -500,6 +504,16 @@ if __name__ == "__main__":
         with open(dump_path, 'wb') as fp:
             pickle.dump((train_dataset, dev_dataset), fp)
 
-    train(train_dataset, dev_dataset, args.output_path)
+    train(
+        train_dataset,
+        dev_dataset,
+        args.output_path,
+        model_name=args.model_name,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        lr=args.lr,
+        warmup_ratio=args.warmup_ratio,
+        seed=args.seed,
+    )
 
 
