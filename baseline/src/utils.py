@@ -2,13 +2,15 @@ import json
 import random
 
 
-def load_json_data(path):
+def load_json_data(path: str) -> object:
+    """Load and return the contents of a JSON file."""
     with open(path, 'r', encoding='utf-8') as fp:
         data = json.load(fp)
     return data
 
 
-def load_jsonl_data(path):
+def load_jsonl_data(path: str) -> list:
+    """Load and return all records from a JSONL file as a list of dicts."""
     data = []
     with open(path, 'r', encoding='utf-8') as fp:
         for line in fp:
@@ -17,19 +19,22 @@ def load_jsonl_data(path):
     return data
 
 
-def dump_json_data(data, path):
+def dump_json_data(data: object, path: str) -> None:
+    """Write data to a JSON file with standard formatting."""
     with open(path, 'w', encoding='utf-8') as fp:
         json.dump(data, fp, ensure_ascii=True,
                   indent=2, separators=(", ", ": "))
 
 
-def shorten_entity_description(entity_description, max_len):
+def shorten_entity_description(entity_description: str, max_len: int) -> str:
+    """Truncate an entity description to at most max_len whitespace-separated tokens."""
     entity_description_tokens = entity_description.split(" ")
     entity_description = ' '.join(entity_description_tokens[: max_len])
     return entity_description
 
 
-def formulate_candidates(candidate_list, max_len):
+def formulate_candidates(candidate_list: list, max_len: int) -> str:
+    """Format a shuffled list of candidate entities into a numbered prompt string."""
     candidates = ""
     candidate_template = '\n\nID: {}\nEntity: {}\nEntity Description: {}\nEntity Types: {}'
     random.shuffle(candidate_list)
@@ -43,7 +48,8 @@ def formulate_candidates(candidate_list, max_len):
     return candidates
 
 
-def is_length_valid(model_path, human_value, gpt_value, tokenizer, max_input_length=4000):
+def is_length_valid(model_path: str, human_value: str, gpt_value: str, tokenizer, max_input_length: int = 4000) -> bool:
+    """Return True if the tokenized chat prompt is within max_input_length tokens."""
     messages = [
         {"role": "user", "content": human_value},
         {"role": "assistant", "content": gpt_value}

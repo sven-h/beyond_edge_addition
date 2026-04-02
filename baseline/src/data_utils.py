@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 @dataclasses.dataclass
 class EntityDict:
+    """An entity extracted from text, with optional linking candidate metadata."""
     qid: str
     candidate_mention: Optional[str] = None
     candidate_definition: Optional[str] = None
@@ -19,6 +20,7 @@ class EntityDict:
 
 @dataclasses.dataclass
 class KGElement:
+    """A single element (entity, relation, or class) in the knowledge graph."""
     identifier: str = ""
     label: str = ""
     definition: str = ""
@@ -27,6 +29,7 @@ class KGElement:
 
 @dataclasses.dataclass
 class Example:
+    """A text example with its associated entities and triples."""
     text: str
     entities: List[EntityDict]
     triples: List[tuple]
@@ -43,7 +46,8 @@ def create_full_entity_description(label: str, definition: str, types: List[str]
         return f"{label}: {definition}"
 
 
-def get_raw_text(text: str) -> tuple:
+def get_raw_text(text: str) -> tuple[str, str]:
+    """Strip a trailing RDF language tag (e.g. '@en') and return (text, lang_tag)."""
     lang_tag = ""
     if "@" in text:
         position = text.rfind("@")
@@ -52,6 +56,8 @@ def get_raw_text(text: str) -> tuple:
     return text, lang_tag
 
 class KGContainer:
+    """Loads and caches a knowledge graph from N-Triples files into in-memory dicts."""
+
     def __init__(self, data_folder: str = "data/ie_dataset_v3/"):
         if os.path.exists(data_folder + "cached.pkl"):
             relations, classes, entities, entity_qids = pickle.load(open(data_folder + "cached.pkl", "rb"))
@@ -88,6 +94,7 @@ class KGContainer:
 
     @staticmethod
     def normalize(element: str) -> str:
+        """Strip angle brackets from URIs and remove language tags and quotes from literals."""
         element = element.strip()
         uri_regex = r"<(.*?)>"
         if match(uri_regex, element):
@@ -100,6 +107,7 @@ class KGContainer:
 
 
     def init_dicts(self, filename: str) -> dict:
+        """Parse an N-Triples file and return a dict mapping subject URIs to KGElement."""
         print(f"Loading {filename}...")
         labels_dict = defaultdict(set)
         descriptions_dict = defaultdict(set)
@@ -143,6 +151,7 @@ class KGContainer:
 
 
     def types(self, qid: str, return_raw: bool = False) -> List[str]:
+        """Return human-readable type labels for an entity. If return_raw, return raw URIs."""
         if return_raw:
             return self.entities[qid].types
         else:
@@ -151,16 +160,20 @@ class KGContainer:
         return type_strings
 
     def definition(self, qid: str) -> str:
+        """Return the definition string for the given entity QID."""
         return self.entities[qid].definition
 
     def label(self, qid: str) -> str:
+        """Return the primary label for the given entity QID."""
         return self.entities[qid].label
 
     def aliases(self, qid: str) -> List[str]:
+        """Return the list of aliases for the given entity QID."""
         return self.entities[qid].aliases
 
 
 def load_data(file_name: str, kgc: KGContainer) -> List[Example]:
+    """Load examples from a JSONL file, enriching entities with generated definitions from kgc."""
     examples = []
     missing_entities = 0
     num_entities = 0

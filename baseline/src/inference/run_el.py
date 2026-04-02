@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--sc_llm",
         default="meta-llama/Llama-3.1-8B-Instruct",
-        help="LLM used for schema canonicaliztion verification.",
+        help="LLM used for schema canonicalization verification.",
     )
     parser.add_argument(
         "--sc_embedder", default="intfloat/e5-mistral-7b-instruct",
@@ -171,8 +171,16 @@ if __name__ == "__main__":
         if folder.startswith("iter") and folder[4:].isdigit():
             max_iter = max(max_iter, int(folder[4:]))
 
+    if max_iter < 0:
+        raise FileNotFoundError(f"No iter{{n}} folders found in {data_path}. Run the EDC pipeline first.")
+
     schema_dict_path = os.path.join(data_path, f"iter{max_iter}", "schema_dict.json")
     result_at_stage_path = os.path.join(data_path, f"iter{max_iter}", "result_at_each_stage.json")
+
+    if not os.path.exists(schema_dict_path):
+        raise FileNotFoundError(f"Schema dict not found: {schema_dict_path}")
+    if not os.path.exists(result_at_stage_path):
+        raise FileNotFoundError(f"Result-at-stage file not found: {result_at_stage_path}")
 
     schema_dict = json.load(open(schema_dict_path, "r"))
     result_at_stage = json.load(open(result_at_stage_path, "r"))
