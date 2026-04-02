@@ -26,6 +26,7 @@ if __name__ == "__main__":
         "--include_relation_example", type=str, default="self")
 
     parser.add_argument("--cluster",  action="store_true", help="Whether to use cluster mode.")
+    parser.add_argument("--skip_el", action="store_true", help="Skip entity linking and output canonicalized triples only (RE-only mode).")
     parser.add_argument("--initial_refine", action="store_true")
     parser.add_argument("--block_refine_relations", action="store_true")
 

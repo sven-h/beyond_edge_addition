@@ -50,18 +50,19 @@ class EDC:
         # Refinement settings
         self.sr_adapter_path = edc_configuration["sr_adapter_path"]
 
-        # EL settings
-        self.el_llm_name = edc_configuration["el_llm"]
-        self.cluster = edc_configuration["cluster"]
-        self.el_embedder_name = edc_configuration["el_embedder"]
-        self.el_index_path = edc_configuration["el_index"]
-        self.el_mapping = edc_configuration["el_mapping"]
-        self.me_threshold = edc_configuration["me_threshold"]
-        self.mm_threshold = edc_configuration["mm_threshold"]
-        self.el_prompt_path = edc_configuration["el_prompt_path"]
-        self.path_threshold = edc_configuration["path_threshold"]
-        self.el_disambiguator_name = edc_configuration["el_disambiguator"]
-        self.el_adapter_path = edc_configuration["el_adapter_path"]
+        # EL settings (optional when skip_el=True)
+        self.skip_el = edc_configuration.get("skip_el", False)
+        self.el_llm_name = edc_configuration.get("el_llm", "meta-llama/Llama-3.1-8B-Instruct")
+        self.cluster = edc_configuration.get("cluster", False)
+        self.el_embedder_name = edc_configuration.get("el_embedder", "intfloat/e5-mistral-7b-instruct")
+        self.el_index_path = edc_configuration.get("el_index", None)
+        self.el_mapping = edc_configuration.get("el_mapping", None)
+        self.me_threshold = edc_configuration.get("me_threshold", 0.5)
+        self.mm_threshold = edc_configuration.get("mm_threshold", 0.5)
+        self.el_prompt_path = edc_configuration.get("el_prompt_path", "data")
+        self.path_threshold = edc_configuration.get("path_threshold", 0.75)
+        self.el_disambiguator_name = edc_configuration.get("el_disambiguator", None)
+        self.el_adapter_path = edc_configuration.get("el_adapter_path", None)
         self.include_relation_example = edc_configuration["include_relation_example"]
         self.relation_examples = None
         if self.include_relation_example != "self":
@@ -752,6 +753,19 @@ class EDC:
                     final_result_file.write("\n")
                 final_result_file.flush()
 
+
+        if self.skip_el:
+            # RE-only mode: output canonicalized triples without entity linking.
+            final_results = [
+                {
+                    "index": idx,
+                    "input_text": input_text_list[idx],
+                    "canonicalized_triplets": triplets_from_last_iteration[idx],
+                }
+                for idx in range(len(triplets_from_last_iteration))
+            ]
+            json.dump(final_results, open(f"{output_dir}/final_re_results.json", "w"), indent=4)
+            return triplets_from_last_iteration
 
         linked_triplets_list = self.do_linking(input_text_list, triplets_from_last_iteration, schema_dict)
         el_result_dir = f"{output_dir}/el"
