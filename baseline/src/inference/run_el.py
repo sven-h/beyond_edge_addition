@@ -179,7 +179,7 @@ if __name__ == "__main__":
     can_triplets_list = []
     input_text_list = []
     for item in result_at_stage:
-        can_triplets_list.append(item["schema_canonicalizaiton"])
+        can_triplets_list.append(item["schema_canonicalization"])
         input_text_list.append(item["input_text"])
 
     linked_triplets_list = edc.do_linking(

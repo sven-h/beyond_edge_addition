@@ -738,7 +738,7 @@ class EDC:
                     "oie": oie_triplets_list[idx],
                     "schema_definition": sd_dict_list[idx],
                     "canonicalization_candidates": str(canon_candidate_dict_list[idx]),
-                    "schema_canonicalizaiton": canon_triplets_list[idx],
+                    "schema_canonicalization": canon_triplets_list[idx],
                 }
                 json_results_list.append(result_json)
             result_at_each_stage_file = open(f"{iteration_result_dir}/result_at_each_stage.json", "w")
@@ -768,7 +768,7 @@ class EDC:
                 "oie": oie_triplets_list[idx],
                 "schema_definition": sd_dict_list[idx],
                 "canonicalization_candidates": str(canon_candidate_dict_list[idx]),
-                "schema_canonicalizaiton": canon_triplets_list[idx],
+                "schema_canonicalization": canon_triplets_list[idx],
                 "linked_triplets": mapped_linked_triplet,
             }
             final_results.append({
