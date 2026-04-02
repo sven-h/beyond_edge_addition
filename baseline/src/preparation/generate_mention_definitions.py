@@ -29,14 +29,14 @@ def parse_output(output: str) -> List[dict]:
         else:
             return []
     return []
-def generate_definitions(examples: List[Example], kg_container: KGContainer, output_file: str, batch_size: int = 50000):
-    model = "meta-llama/Llama-3.1-8B-Instruct"  # Choose any available model
-    model = LLM(model=model, max_model_len=4096) # dtype=torch.bfloat16, trust_remote_code=True, quantization="bitsandbytes",
-                #load_format="bitsandbytes", ,)
+def generate_definitions(examples: List[Example], kg_container: KGContainer, output_file: str, model_name: str = "meta-llama/Llama-3.1-8B-Instruct", max_model_len: int = 4096, prompt_file: str = "prompt.txt", batch_size: int = 50000):
+    model = LLM(model=model_name, max_model_len=max_model_len)
 
     all_messages = []
     all_entity_labels = []
-    main_prompt = open("prompt.txt").read()
+    if not os.path.exists(prompt_file):
+        raise FileNotFoundError(f"Prompt file not found: {prompt_file}")
+    main_prompt = open(prompt_file).read()
     for example in tqdm(examples):
         entity_labels = [kg_container.label(x.qid) for x in example.entities if x.qid in kg_container.entities]
         joined_entities = '\n'.join(entity_labels)
@@ -81,7 +81,7 @@ def generate_definitions(examples: List[Example], kg_container: KGContainer, out
                             x = {key.strip(): value for key, value in x.items()}
                             encountered.add(x["entity"])
                             generated_entities.append(x)
-                    except:
+                    except (KeyError, TypeError):
                         continue
             overall_entities += len(entity_labels)
             missing_entities += len(entity_labels) - len(encountered)
@@ -94,9 +94,11 @@ def generate_definitions(examples: List[Example], kg_container: KGContainer, out
 
         print(f"Ratio of missing entities: {missing_entities / overall_entities}")
 
-def generate_worker(gpu_id: int, batch_examples: List[Example], kg_container: KGContainer, output_file: str, n: int, prompt_file: str):
+def generate_worker(gpu_id: int, batch_examples: List[Example], kg_container: KGContainer, output_file: str, n: int, prompt_file: str, model_name: str = "meta-llama/Llama-3.1-8B-Instruct", max_model_len: int = 4096):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
-    model = LLM(model="meta-llama/Llama-3.1-8B-Instruct", max_model_len=4096)
+    if not os.path.exists(prompt_file):
+        raise FileNotFoundError(f"Prompt file not found: {prompt_file}")
+    model = LLM(model=model_name, max_model_len=max_model_len)
 
     all_messages = []
     all_entity_labels = []
@@ -146,7 +148,7 @@ def generate_worker(gpu_id: int, batch_examples: List[Example], kg_container: KG
                             x = {key.strip(): value for key, value in x.items()}
                             encountered.add(x["entity"])
                             generated_entities.append(x)
-                    except:
+                    except (KeyError, TypeError):
                         continue
 
             overall_entities += len(entity_labels)
@@ -169,6 +171,8 @@ if __name__ == "__main__":
     argparser.add_argument("output_file", type=str)
     argparser.add_argument("--kg_data_path", type=str, default="data/")
     argparser.add_argument("--prompt_file", type=str, default="prompt.txt")
+    argparser.add_argument("--model_name", type=str, default="meta-llama/Llama-3.1-8B-Instruct", help="vLLM model name")
+    argparser.add_argument("--max_model_len", type=int, default=4096, help="Maximum model context length")
     argparser.add_argument("-n", type=int, default=1)
     args = argparser.parse_args()
 
@@ -187,7 +191,7 @@ if __name__ == "__main__":
     for i in range(num_gpus):
         p = multiprocessing.Process(
             target=generate_worker,
-            args=(i, chunks[i], kg_container, args.output_file, args.n, args.prompt_file)
+            args=(i, chunks[i], kg_container, args.output_file, args.n, args.prompt_file, args.model_name, args.max_model_len)
         )
         p.start()
         processes.append(p)
